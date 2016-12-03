@@ -1,0 +1,35 @@
+#lang br/quicklang
+
+; Reader
+(define (read-syntax path port)
+  (define src-lines (port->lines port))
+  (define src-datums (format-datums '~a src-lines))
+  (define module-datum `(module stacker-mod "funstacker.rkt" 
+                          (handle-args ,@src-datums)))
+  (datum->syntax #f module-datum))
+(provide read-syntax)
+
+; Expander
+(define-macro (funstacker-module-begin HANDLE-ARGS-EXPR)
+  #'(#%module-begin
+     (display (first HANDLE-ARGS-EXPR))))
+(provide (rename-out [funstacker-module-begin #%module-begin]))
+
+; Handle
+(define (handle-args . args)
+  (for/fold ([stack-acc empty])
+            ([arg (filter-not void? args)])
+    (cond
+      [(number? arg) (cons arg stack-acc)]
+      [(or (equal? + arg) (equal? * arg))
+       (define op-result
+         (arg (first stack-acc) (second stack-acc)))
+       (cons op-result (drop stack-acc 2))])))
+(provide handle-args)
+
+; Numeric operations
+(provide + *)
+
+
+
+
