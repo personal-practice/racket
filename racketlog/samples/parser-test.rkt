@@ -3,4 +3,5 @@
          racketlog/tokenizer
          brag/support)
 
-;(parse (apply-tokenizer tokenize "//Silly example\n fact(1234).\n ?query(X)."))
+;(parse-tree (apply-tokenizer tokenize ";Silly example\n fact(1234)."))
+;(parse-tree (apply-tokenizer tokenize "//Silly example\n fact(1234).\n ?query(X)."))

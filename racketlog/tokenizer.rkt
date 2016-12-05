@@ -8,10 +8,16 @@
       (lexer
        [(eof)
         eof]
+       [":-"
+        (token 'IMPLY-TOK lexeme)]
+       [(char-set "().:-?")
+        lexeme]
        [(from/to "//" "\n")
         (next-token)]
-       [(char-set "?:-.,()")
-        lexeme]
+       [(from/to ";" "\n")
+        (next-token)]               
+       [(char-set ",")
+        (next-token)]
        [(repetition 1 +inf.0 upper-case)
         (token 'VAR-TOK lexeme )]
        [(repetition 1 +inf.0 lower-case)

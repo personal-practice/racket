@@ -1,17 +1,19 @@
 #lang brag
-racketlog-program : clause* [query]
 
-clause            : fact | rule
-fact              : predicate "."
-rule              : predicate ":" "-" predicate-list "."
-predicate-list    : predicate ("," predicate)*
+racketlog-program : clause* query
+
+clause            : predicate "."
+                  | predicate IMPLY-TOK predicate-list "."
+
+predicate         : ATOM-TOK
+                  | functor
+
+predicate-list    : predicate+
+
 query             : "?" predicate-list "."
 
-predicate         : atom | functor
-term-list         : term ("," term)*
-term              : number | atom | variable | functor
+functor           : ATOM-TOK "(" term-list ")"
 
-functor           : atom "(" term-list ")"
-atom              : ATOM-TOK
-variable          : VAR-TOK
-number            : NUM-TOK
+term-list         : term+
+
+term              : NUM-TOK | ATOM-TOK | VAR-TOK | functor
