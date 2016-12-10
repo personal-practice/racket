@@ -1,43 +1,46 @@
 #lang br/quicklang
 (require racketlog)
 (provide ; Transliteration
-         racketlog-program clause query functor term
-         ; Implementation
-         <- ?
-         ; Macro Setup
-         (rename-out [racketlog-module-begin #%module-begin]))
+ racketlog-program clause query functor
+ ; Implementation
+ ;<- ?
+ ; REPL
+ ;#%top-interaction
+ ; Macro Setup
+ (rename-out [racketlog-module-begin #%module-begin]))
 
 (define-macro (racketlog-module-begin PARSE-TREE)
   #'(#%module-begin
-     PARSE-TREE))
+     PARSE-TREE     
+     ))
 
 ; Transliteration
-(define-macro (racketlog-program CLAUSES ... QUERY)
+(define-macro (racketlog-program CLAUSES ... QUERY)  
   #'(begin
-      CLAUSES ...
-      QUERY
+      (displayln "============= KNOWLEDGE BASE ============")
+      ; Populate knowledge base (KB)
+      (define kb (list CLAUSES ...))
+      ; Print KB
+      (map (lambda (t)
+             (println t))
+           kb)
+      (displayln "==========================================")
+      ; Print query
+      (displayln (list "?" (list QUERY)))
+      (displayln "END")
       ))
 
 (define-macro-cases clause
   [(clause (predicate PRED) ".")
-   #'(<- PRED)]
+   #'(list PRED)]
   [(clause (predicate HEAD) ":-" (predicate-list (predicate PRED) ...) ".")
-   #'(<- HEAD PRED ...)])
+   #'(list HEAD PRED ...)])
 
 (define-macro (query "?" (predicate-list (predicate PRED) ...) ".")
-  #'(? PRED ...))
+  #'(list PRED ...))
 
-(define-macro (functor NAME "(" (term-list TERM-LIST ...) ")")
-  (with-pattern ([S-NAME (format-datum '~a #'NAME)])
-    #'(list 'S-NAME TERM-LIST ...)))
-
-(define-macro (term TERM)
-  #'TERM)
-
+(define-macro (functor NAME "(" (term-list (term TERM) ...) ")")
+  ;(with-pattern ([S-NAME (format-datum '~a #'NAME)])
+  #'(list 'NAME 'TERM ...))
 
 ; Implementation
-(define-macro (<- KB ...)
-  #'(displayln (list "<-" KB ...)))
-
-(define-macro (? S ...)
-  #'(displayln (list "?" S ...)))
